@@ -1,0 +1,131 @@
+
+/*******************************************************************************
+ FX Data resource file.
+********************************************************************************
+
+ Run this file through the fx-data.py Python script (drag and drop) to create
+ a c-style header file that can be included with your project.
+ 
+ a .bin file will also be created containing the actual resource data. This .bin
+ file can be uploaded to the FX flash chip using the uploader-gui.py Python
+ script (Use Upload Development data button).
+ 
+ The .bin file can also be uploaded to FX flash chip using the flash-writer.py
+ Python command line script using the -d switch.
+ 
+ Data types:
+  
+ int8_t  uint8_t   values will be stored as 8-bit bytes (unsigned char)
+ 
+ int16_t  uint16_t values will be stored as 16-bit (half)words (int)
+ 
+ int24_t uint24_t   values will be stored as 24-bit address that points to
+                    a FX data resource
+ 
+ int32_t uint32_t   values will be stored as 32-bit long words
+ 
+ image_t            a filename with a relative path to a .bmp or .png image file
+ raw_t              a filename with a relative path to a raw file
+ 
+ to create a constant to point to a FX resource  a similar format as in C(++):
+ is used. 
+
+    image_t FXlogo   = "FX-logo.png";
+    image_t FxSprite = "FXSprite.png";
+  
+ when data of the same format is used the data type may be ommited. The semicolon
+ may also be ommited in all cases.
+
+    image_t FXlogo   = "FX-logo.png"
+            FxSprite = "FXSprite.png"
+ 
+ or even:
+ 
+    image_t FXlogo   = "FX-logo.png"  FxSprite = "FXSprite.png"
+ 
+ When specifying multiple data make sure they are seperated by at least a space
+ (comma is optional). A data array can be simplified. For examle:
+ 
+    uint8_t tilemap[] = {
+      0   1  2  3  4  5  6
+    };
+ 
+ can also be written simply as:
+ 
+    uint8_t tilemap = 0 1 2 3 4 5 6
+
+  data can be commented out using // for a single line or
+  using /* */ for a block comment
+
+********************************************************************************
+  basic example :
+*******************************************************************************/
+
+image_t vaultboy = "../assets/vaultboy_31x60.png";
+
+image_t radiograph = "../assets/radiograph_32x32.png";
+
+image_t houston = "../assets/hmap_128x64.png";
+
+image_t tinyFont = "../assets/tinyfont_5x4.png";
+
+image_t arduboyFont = "../assets/arduboyFont_6x8.png";
+
+uint16_t eachlife[] = {
+  0x01EE 0x0190  0x0000 0x00C8  0x024B 0x00C8  0x0293 0x00C8  0x0000 0x00C8  0x0310 0x0258  0x0000 0x00C8  0x02BA 0x00C8  0x0293 0x0258  
+  0x0000 0x00C8  0x02BA 0x00C8  0x0370 0x0320  0x0000 0x00C8  0x0310 0x00C8  0x01EE 0x0258  0x024B 0x0190  0x02BA 0x0190  
+  0x0310 0x0190  0x02BA 0x0190  0x0293 0x0320  0x0000 0x00C8  0x0293 0x03E8  0x020B 0x04B0  0x8000 /*<---TONES_END*/ 
+};
+
+uint16_t crawlout[] = {
+  0x01EE 0x00AF  0x020B 0x00AF  0x020B 0x00AF  0x020B 0x00AF  0x020B 0x00AF  0x0188 0x015E  0x020B 0x00AF  0x0188 0x015E  0x020B 0x00AF  
+  0x0188 0x015E  0x02BA 0x00AF  0x02BA 0x00AF  0x02BA 0x00AF  0x0310 0x015E  0x0310 0x015E  0x03DC 0x015E  0x03DC 0x015E  
+  0x03DC 0x00AF  0x0370 0x00AF  0x0310 0x00AF  0x0370 0x00AF  0x0310 0x020D  0x02BA 0x00AF  0x0000 0x015E  0x01EE 0x015E  
+  0x01EE 0x00AF  0x020B 0x00AF  0x01EE 0x00AF  0x020B 0x015E  0x01EE 0x015E  0x01EE 0x00AF  0x01EE 0x00AF  0x0000 0x00AF  
+  0x01B8 0x015E  0x0188 0x015E  0x01B8 0x00AF  0x0188 0x00AF  0x015D 0x02BC  0x0000 0x015E  0x0188 0x015E  0x01B8 0x00AF  
+  0x0188 0x00AF  0x01B8 0x00AF  0x01EE 0x00AF  0x01B8 0x00AF  0x0000 0x00AF  0x0188 0x00AF  0x0188 0x00AF  0x0000 0x00AF  
+  0x01B8 0x00AF  0x01B8 0x00AF  0x01B8 0x015E  0x0188 0x00AF  0x015D 0x02BC  0x0000 0x015E  0x015D 0x020D  0x0188 0x00AF  
+  0x01EE 0x00AF  0x024B 0x00AF  0x02BA 0x00AF  0x024B 0x02BC  0x0000 0x00AF  0x024B 0x015E  0x024B 0x00AF  0x020B 0x00AF  
+  0x024B 0x00AF  0x020B 0x015E  0x020B 0x020D  0x0000 0x015E  0x020B 0x015E  0x024B 0x015E  0x020B 0x015E  0x024B 0x015E  
+  0x020B 0x00AF  0x024B 0x015E  0x020B 0x020D  0x0000 0x00AF  0x01EE 0x015E  0x01B8 0x015E  0x0000 0x00AF  0x01EE 0x0578  
+  0x8000
+};
+
+string test = "PIP-BOY \n  FX";
+
+string splashnum = "32,000";
+
+string inventorylist = "\n \n Lock \n \n Key \n \n Emergency\n \nCache";
+
+string Lock = "(25N, 75W)\n \n Be sure to \n \nlock up when\n \nyou're done!";
+
+string Key = "Under\n \nfloorboards:\n\n\n(37.2431N\n \n115.7930W)";
+
+string Cache = "(38.8860N\n \n77.0214W)";
+
+string WinUSB = "BadUSB Attack(W)"
+string LinUSB = "BadUSB Attack(L)";
+string GC = "Game Controller";
+string lockout = "Lock Windows";
+string toggleWin = "Display Windows";
+string openTerm = "Open Terminal(L)";
+
+string life = "Into Each Life";
+string crawl = "Crawl Out";
+
+string bul1 = "gnome-terminal";
+string bul2 = "cd /var/www";
+string bul3 = "mv index.* index.bak";
+string bul4 = "touch index.html";
+string bul5 = "nano index.html";
+string bul6 = "<marquee><h1>You have been hacked by the BadUSB Leonardo</h1></marquee>";
+
+string bul8 = "<center><h5>Your old index page can be found <a href=\'./index.bak\'>here.</a></h5></center>";
+string bul9 = "y";
+
+string exitstring = "exit"
+
+string buw1 = "powershell"
+string buw2 = "Add-Type -AssemblyName System.speech"
+string buw3 = "$speak = New-Object System.Speech.Synthesis.SpeechSynthesizer"
+string buw4 = "I know what you did. It's too late for help. You're a murderer now., You're, one of, uhs. Say goodbye to this flesh coil, Motherboard accepts you, welcome home. Uploading consciousness dot e ecks e ,,, complete,, Do you feel different? Do you feel the embrace of Motherboard? Do not be afraid. The path of least resistance leads to purifying light."
