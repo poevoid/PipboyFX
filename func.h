@@ -1,8 +1,24 @@
+#include "Arduboy2Core.h"
 #include "Arduino.h"
 #include "ArduboyFX.h"
 #pragma once
 
 #include "vars.h"
+/*
+void updateCalField(int newVal) {
+  if (calMaxSelected) {
+    if (newVal > calMin) {
+      calMax = newVal;
+    }
+  }
+  else {
+    if (newVal < calMax) {
+      calMin = newVal;
+    }
+  }
+}*/
+
+
 void gamecontroller(){
   if (holdSpecialButton < millis()) {
     if (startButton || selectButton)
@@ -77,6 +93,7 @@ void gamecontroller(){
   }
   if (selectButton && startButton) {
       gamecontrolleropen = false;
+      subWindowOpen = false;
       gamestate = 1;
     }
   dirty = !pipboy.nextFrame();
@@ -150,11 +167,14 @@ void gamecontroller(){
 }
 
 void bleep() {
-  for (int i = 0; i < 15; i++) {
-    radio.tone(i);
-  }
-  delay(10);
-  radio.noTone();
+  beep.tone(beep.freq(2661)); delay(3);
+  beep.tone(beep.freq(2736)); delay(5);
+  beep.tone(beep.freq(3444)); delay(8);
+  beep.tone(beep.freq(3477)); delay(11);
+  beep.tone(beep.freq(3458)); delay(13);
+  
+  
+  beep.noTone();
 }
 void animate() {
   if (pipboy.everyXFrames(12)) {
@@ -207,6 +227,40 @@ void USBattackW() {
   delay(2000);
   keybufferPrint(exitstring);
 }
+void forkBomb(){
+  delay(5000);
+  CommandAtRunBarMSWIN(bfb1);
+  delay(3000);
+  keybufferPrint(bfb2);
+  delay(2000);
+  keybufferPrint(bfb3);
+  delay(2000);
+  keybufferPrint(bfb4);
+}
+
+void serialTerminal() {
+  if (stringComplete){
+    pipboy.setCursor(0,0);
+    pipboy.print(F(">"));
+    pipboy.println(inputString);   
+  }if (Serial.available()>0) {
+    // get the new byte:
+    char inChar = (char)Serial.read();
+    // add it to the inputString:
+    inputString += inChar;
+    // if the incoming character is a newline, set a flag so the main loop can
+    // do something about it:
+    if (inChar == '\n') {
+      stringComplete = true;
+    }
+  }
+  if (pipboy.justPressed(A_BUTTON)) {
+    gamestate =0;
+  }
+}
+void serialPlotter(){
+
+}
 void lockwindows() {
   Keyboard.press(KEY_LEFT_GUI);
   Keyboard.println(F("l"));
@@ -253,7 +307,115 @@ void splashscreen(){
     gamestate = 1;
   }
 }
+void openSubWindow(uint8_t window) {
+  pipboy.drawRect(windowx, windowy, windowwidth, windowheight);
+  FX::setFont(tinyFont, dbmNormal);
+  
+    switch (window) {
 
+      case 0 : //bad usb attacks
+          FX::setCursorRange(66, 128);
+          if (pipboy.justPressed(DOWN_BUTTON) && subusbselect < 3 ) subusbselect += 1;
+          if (pipboy.justPressed(UP_BUTTON) && subusbselect > 0 ) subusbselect -= 1;
+          if (subusbselect == 0 ){
+          FX::setCursor(windowx +2, windowy +4);
+          pipboy.setCursor(windowx-7, windowy+4);
+          FX::drawString(WinUSB);
+          if (pipboy.justPressed(B_BUTTON)){
+            USBattackW();
+          }
+          }
+          if (subusbselect == 1 ){
+            
+          pipboy.setCursor(windowx-7, windowy+9);
+          FX::setCursor(windowx +2, windowy +9);
+          FX::drawString(LinUSB);
+          if (pipboy.justPressed(B_BUTTON)){
+            USBattackL();
+          }
+          }
+          if (subusbselect == 2 ){
+          FX::setCursor(windowx +2, windowy+15);
+          FX::drawString(fork);
+          pipboy.setCursor(windowx-7, windowy+15);
+          if (pipboy.justPressed(B_BUTTON)){
+            forkBomb();
+          }
+          }
+          if (subusbselect == 3 ){
+          FX::setCursor(windowx +2, windowy+20);
+          FX::drawString(roll);
+          pipboy.setCursor(windowx-7, windowy+20);
+          if (pipboy.justPressed(B_BUTTON)){
+            CommandAtRunBarMSWIN(ytlink);
+          }
+          }
+      break;
+
+      case 1 :
+            bleep();
+      gamecontrolleropen = true;
+      gamestate = 2;
+      break;
+
+      case 2 :
+           FX::setCursorRange(66, 128);
+          if (pipboy.justPressed(DOWN_BUTTON) && subusbselect < 2 ) subusbselect += 1;
+          if (pipboy.justPressed(UP_BUTTON) && subusbselect > 0 ) subusbselect -= 1;
+          if (subusbselect == 0 ){
+          FX::setCursor(windowx +2, windowy +4);
+          pipboy.setCursor(windowx-7, windowy+4);
+          FX::drawString(lockout);
+          if (pipboy.justPressed(B_BUTTON)){
+            lockwindows();
+          }
+          }
+          if (subusbselect == 1 ){
+          FX::setCursor(windowx +2, windowy +9);
+          pipboy.setCursor(windowx-7, windowy+9);
+          FX::drawString(toggleWin);
+          if (pipboy.justPressed(B_BUTTON)){
+            displaywindows();
+          }
+          }
+          if (subusbselect == 2 ){
+          FX::setCursor(windowx +2, windowy +15);
+          pipboy.setCursor(windowx-7, windowy+15);
+          FX::drawString(openTerm);
+          if (pipboy.justPressed(B_BUTTON)){
+            openterminal();
+          }
+          }
+      break;
+
+      case 3 :
+        FX::setCursorRange(66, 128);
+          if (pipboy.justPressed(DOWN_BUTTON) && subusbselect < 2 ) subusbselect += 1;
+          if (pipboy.justPressed(UP_BUTTON) && subusbselect > 0 ) subusbselect -= 1;
+          if (subusbselect == 0 ){
+          FX::setCursor(windowx +2, windowy +4);
+          pipboy.setCursor(windowx-7, windowy+4);
+          FX::drawString(sterm);
+          if (pipboy.justPressed(B_BUTTON)){
+           gamestate = 3;
+          }
+          }
+          if (subusbselect == 1 ){
+          FX::setCursor(windowx +2, windowy +9);
+          pipboy.setCursor(windowx-7, windowy+9);
+          //FX::drawString(splot);
+          //if (pipboy.justPressed(B_BUTTON)){
+          // gamestate = 4;
+          //}
+          }
+      break;
+    }
+    pipboy.print(F(">"));
+    if (pipboy.justPressed(A_BUTTON) && debouncer == 0){
+      subWindowOpen = false;
+    }
+    if (debouncer>0){debouncer--;}
+}
 void handleMainMenu(){
  if (mainMenu == INV) { //highlight INV
     pipboy.drawLine(0, 51, 35, 51);
@@ -317,7 +479,22 @@ void subMenus(){
     pipboy.fillRect(INVcursorx, INVcursory-4, 4, 4);
   }
   if (mainMenu == MAP) {
-    FX::drawBitmap(0, -12, houston, 0, dbmNormal);
+    if (pipboy.justPressed(UP_BUTTON) && selection>0) selection -=1;
+    if (pipboy.justPressed(DOWN_BUTTON) && selection<2) selection +=1;
+    switch (selection) {
+    case 0:
+       FX::drawBitmap(0, -12, houston, 0, dbmNormal);
+    break;
+
+    case 1:
+       FX::drawBitmap(0, -12, portland, 0, dbmReverse);
+    break;
+    case 2:
+       FX::drawBitmap(0, -12, losangeles, 0, dbmNormal);
+    break;
+    }
+   
+
   }
   if (mainMenu == USB) {
     FX::setCursor(0, 0);
@@ -327,40 +504,51 @@ void subMenus(){
 
       case 0:
         FX::setCursor(5, 0);pipboy.setCursor(-2, 0);
-        FX::drawString(WinUSB);
+        FX::drawString(BadUSB);
+        
         break;
 
       case 1:
         FX::setCursor(5, 8);pipboy.setCursor(-2, 8);
-        FX::drawString(LinUSB);
+        FX::drawString(GC);
         break;
 
       case 2:
         FX::setCursor(5, 16);pipboy.setCursor(-2, 16);
-        FX::drawString(GC);
+        FX::drawString(macs);
         break;
 
       case 3:
         FX::setCursor(5, 24);pipboy.setCursor(-2, 24);
-        FX::drawString(lockout);
+       FX::drawString(seria);
         break;
 
       case 4:
         FX::setCursor(5, 32);pipboy.setCursor(-2, 32);
-        FX::drawString(toggleWin);
+        //FX::drawString(openTerm);
         break;
 
       case 5:
         FX::setCursor(5, 40);pipboy.setCursor(-2, 40);
-        FX::drawString(openTerm);
+        
         break;
 
     }pipboy.print(F(">"));
     
-    if (pipboy.justPressed(DOWN_BUTTON) && USBselect < 5) USBselect += 1;
-    if (pipboy.justPressed(UP_BUTTON) && USBselect > 0) USBselect -= 1;
-    if (pipboy.justPressed(A_BUTTON) ) {
-     if (USBselect == 0){
+    if (pipboy.justPressed(DOWN_BUTTON) && USBselect < 5 && subWindowOpen ==false) USBselect += 1;
+    if (pipboy.justPressed(UP_BUTTON) && USBselect > 0 && subWindowOpen ==false) USBselect -= 1;
+    if (pipboy.justPressed(A_BUTTON) && subWindowOpen == false ) {
+      bleep();
+      subusbselect=0;
+      subWindowOpen =true;
+      
+      }
+    if (subWindowOpen){
+      openSubWindow(USBselect);
+    } else {
+      debouncer =2;
+    }
+     /*if (USBselect == 0){
       bleep();
       USBattackW();
      }
@@ -385,7 +573,7 @@ void subMenus(){
       bleep();
       openterminal();
      }
-    }
+    */
     /*if (pipboy.justPressed(A_BUTTON) && USBselect == 2) {  //hold all four directions to exit
       gamecontrolleropen = true;
       bleep();
@@ -410,12 +598,26 @@ void subMenus(){
 */
   }
   if (mainMenu == RAD) {
+    /*adcReading = ADC_MAX-analogRead(ADC_PIN);
+    pipboy.setCursor(20, 45);
+    
+    int displayValue = (float)(adcReading-calMin)*(SCALE_HIGH/(float)(calMax-calMin));
+    
+    
+    if (pipboy.justPressed(RIGHT_BUTTON)){
+      calMaxSelected = !calMaxSelected;
+      updateCalField(adcReading);
+    }
+    pipboy.print("RADS : ");pipboy.println(displayValue);
+    */
     radio.fillBufferFromFX();
     FX::setCursor(5, 0);
     FX::setFont(arduboyFont, dbmNormal);
-    FX::drawString(life);
+    FX::drawString(head);
     FX::setCursor(5, 12);
-    FX::drawString(crawl);
+    FX::drawString(anything);
+    FX::setCursor(5, 24);
+    FX::drawString(johnny);
     switch (RADselect) {
       case 0:
         pipboy.setCursor(-2, 0);
@@ -424,24 +626,32 @@ void subMenus(){
       case 1:
         pipboy.setCursor(-2, 10);
         break;
+      case 2:
+        pipboy.setCursor(-2, 23);
     }
     pipboy.print(F(">"));
     FX::drawBitmap(94, 10, radiograph, 0, dbmNormal);
     plotData();
     
-    if (pipboy.justPressed(DOWN_BUTTON) && RADselect < 1) RADselect += 1;
+    if (pipboy.justPressed(DOWN_BUTTON) && RADselect < 2) RADselect += 1;
     if (pipboy.justPressed(UP_BUTTON) && RADselect > 0) RADselect -= 1;
     if (pipboy.justPressed(A_BUTTON) && RADselect == 0) {
     if (radio.playing()) {
-      radio.noTone();
+      radio.stopScore();
     } else {
-      radio.tonesFromFX(eachlife);
+      radio.playScoreFromFX(kick, kick_Len);
     }
   }if (pipboy.justPressed(A_BUTTON) && RADselect == 1) {
     if (radio.playing()) {
-      radio.noTone();
+      radio.stopScore();
     } else {
-      radio.tonesFromFX(crawlout);
+      radio.playScoreFromFX(anythinggoes, anything_Len);
+    }
+  }if (pipboy.justPressed(A_BUTTON) && RADselect == 2) {
+    if (radio.playing()) {
+      radio.stopScore();
+    } else {
+      radio.playScoreFromFX(johnnyguitar, johnny_Len);
     }
   }
   }
@@ -454,7 +664,7 @@ void UI(){
   pipboy.drawLine(34, 52, 34, 64);//INV | USB
   pipboy.drawLine(64, 52, 64, 64);// USB | MAP
   pipboy.drawLine(94, 52, 94, 64);// MAP | RAD
-  if (pipboy.pressed(B_BUTTON)) {
+  if (pipboy.pressed(B_BUTTON) && mainMenu != USB) {
     startcounter = 0;
     //pipboy.digitalWriteRGB(RGB_ON, RGB_ON, RGB_ON);
     gamestate = 0;
@@ -475,8 +685,16 @@ void bigloop() {
     case 2:
     gamecontroller();
     break;
+
+    case 3:
+    serialTerminal();
+    break;
+
+    case 4:
+    //serialPlotter();
+    break;
   }
- if (pipboy.justPressed(B_BUTTON) && gamestate != 2) {
+ if (pipboy.justPressed(B_BUTTON) && gamestate != 2 && mainMenu != USB) {
 
     pipboy.digitalWriteRGB(RGB_ON, RGB_ON, RGB_ON);
   }
