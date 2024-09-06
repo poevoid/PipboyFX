@@ -1,7 +1,7 @@
 #include <Keyboard.h>
 #include <Arduboy2.h>  // required to build for Arduboy
 #include <Joystick.h>
-#include "src/ArduboyTonesFX.h"
+#include "src/ArduboyPlaytuneFX.h"
 #include <ArduboyFX.h>      // required to access the FX external flash
 #include "fxdata/fxdata.h"  // this file contains all references to FX data
 
@@ -15,9 +15,9 @@ Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,JOYSTICK_TYPE_GAMEPAD,
   
 
 Arduboy2 pipboy;
-uint16_t radbuffer[8];
-ArduboyTonesFX radio(pipboy.audio.enabled, radbuffer);
-
+uint8_t radbuffer[32];
+ArduboyPlaytuneFX radio(pipboy.audio.enabled, radbuffer);
+BeepPin2 beep;
 #include "func.h"
 
 void setup() {
@@ -27,11 +27,18 @@ void setup() {
   FX::begin(FX_DATA_PAGE);
   FX::setCursorRange(0, 128);
   pinMode(A4, INPUT);
+  //power_adc_enable();
+  //pinMode(ADC_PIN, INPUT);
+  //analogReference(DEFAULT); 
   Serial.begin(9600);
   Joystick.begin();
   Joystick.setXAxisRange(-1, 1);
   Joystick.setYAxisRange(-1, 1);
   Keyboard.begin();
+  pipboy.audio.begin();
+  inputString.reserve(200);
+  radio.initChannel(PIN_SPEAKER_1);
+  radio.initChannel(PIN_SPEAKER_2);
 }
 void loop() {
   // put your main code here, to run repeatedly:
