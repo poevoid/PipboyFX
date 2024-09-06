@@ -3,11 +3,11 @@
 #define USB 1
 #define MAP 2
 #define RAD 3
-
+#define SCALE_HIGH 100.0
+#define ADC_PIN RED_LED
+#define ADC_MAX 1023
 bool gamecontrolleropen = false;
-bool clockwise = false;
-bool anticlockwise = false;
-long oldPosition = -999;
+
 uint8_t gamestate = 0;
 uint8_t currentframe = 0;
 uint8_t firstframe = 0;
@@ -16,13 +16,20 @@ uint8_t startcounter = 0;
 uint8_t mainMenu = INV;
 uint8_t USBselect = 0;
 uint8_t INVselect = 0;
+uint8_t selection =0;
 uint8_t RADselect = 0;
 uint8_t INVcursorx;
 uint8_t INVcursory;
-uint8_t currentawaveframe = 0;
-uint8_t currentbwaveframe = 13;
-int oldPos = -999;
+uint8_t debouncer =2;
+bool subWindowOpen =false;
+String inputString = "";
+bool stringComplete =false;
 int lastSample;
+uint8_t windowx = 64;
+uint8_t windowy = 15;
+uint8_t windowwidth =64;
+uint8_t windowheight =46;
+uint8_t subusbselect =0;
 struct Wave {
   int x;
   int y;
@@ -44,10 +51,12 @@ int prevx =0;
 int prevy =0;
 bool dirty = true;
 /*/////////////////////////////////////////////////////////////////////////////////////////////////*/
+/*int adcReading;
 
-
-
-
+int calMin= -8888;
+int calMax=8888;
+bool calMaxSelected = false;
+*/
 void keybufferPrint(uint24_t address){
    
     size_t length = 0;
