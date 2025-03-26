@@ -261,6 +261,33 @@ void serialTerminal() {
 void serialPlotter(){
 
 }
+void oscilloscope(){
+  dirty = !pipboy.nextFrame();
+  if (dirty) {
+    pipboy.clear();
+  
+  for (waveosc.x = 0; waveosc.x < WIDTH; waveosc.x++) {
+        
+        sample = analogRead(micpin);
+        sample*=ampVal;
+        newy = map((sample), 0, 1024, 0, 32); //adjust this value until newy floats around 32  when ambient so the wave is visible onscreen  
+        waveosc.y = newy;
+
+        pipboy.drawLine( waveosc.x, lastsample, waveosc.x, waveosc.y);
+        pipboy.setCursor(0, 32);
+        lastsample = newy;
+        pipboy.println(sample);
+        pipboy.println(newy);
+      }
+      pipboy.display();
+      dirty = false;
+  }
+  if (pipboy.pressed(A_BUTTON) || pipboy.pressed(B_BUTTON)){
+      oscilloscopeOpen = false;
+      subWindowOpen = false;
+      gamestate = 1;
+  }
+}
 void lockwindows() {
   Keyboard.press(KEY_LEFT_GUI);
   Keyboard.println(F("l"));
@@ -278,22 +305,22 @@ void openterminal() {
   Keyboard.releaseAll();
 }
 void plotData(){
-  for (wave.x=94; wave.x < 126; wave.x++){
+  for (waverad.x=94; waverad.x < 126; waverad.x++){
       int sample = ENIPinRead(A4);
       int newY = map(sample, 0, 200, 15, 42);
 
       //if (newY<10){newY=10;}
      // if (newY>42){newY=42;}
-      wave.y = newY;
-      pipboy.drawLine(wave.x, lastSample, wave.x, wave.y, WHITE);
-      lastSample = newY;
+      waverad.y = newY;
+      pipboy.drawLine(waverad.x, lastsample, waverad.x, waverad.y, WHITE);
+      lastsample = newY;
     }
 }
 
 void splashscreen(){  
   FX::drawBitmap(45, 0, vaultboy, currentframe, dbmNormal);
   animate();
-  FX::setCursor(0, 28);
+  FX::setCursor(0, 28); 
   FX::setFont(arduboyFont, dbmNormal);
   FX::drawString(test);
   FX::setCursor(85, 28);
@@ -400,15 +427,34 @@ void openSubWindow(uint8_t window) {
            gamestate = 3;
           }
           }
+          
+      
+      break;
+
+      case 4:
+      FX::setCursorRange(66, 128);
+          if (pipboy.justPressed(DOWN_BUTTON) && subusbselect < 2 ) subusbselect += 1;
+          if (pipboy.justPressed(UP_BUTTON) && subusbselect > 0 ) subusbselect -= 1;
+          if (subusbselect == 0 ){
+          FX::setCursor(windowx +2, windowy +4);
+          pipboy.setCursor(windowx-7, windowy+4);
+          FX::drawString(mica);
+          micpin = A4;
+          if (pipboy.justPressed(B_BUTTON)){
+           gamestate = 4;
+          }
+          }
           if (subusbselect == 1 ){
           FX::setCursor(windowx +2, windowy +9);
           pipboy.setCursor(windowx-7, windowy+9);
-          //FX::drawString(splot);
-          //if (pipboy.justPressed(B_BUTTON)){
-          // gamestate = 4;
-          //}
+          FX::drawString(micb);
+          micpin= A5;
+           if (pipboy.justPressed(B_BUTTON)){
+           gamestate = 4;
+          }
           }
       break;
+
     }
     pipboy.print(F(">"));
     if (pipboy.justPressed(A_BUTTON) && debouncer == 0){
@@ -526,6 +572,7 @@ void subMenus(){
       case 4:
         FX::setCursor(5, 32);pipboy.setCursor(-2, 32);
         //FX::drawString(openTerm);
+        FX::drawString(osci);
         break;
 
       case 5:
@@ -535,7 +582,7 @@ void subMenus(){
 
     }pipboy.print(F(">"));
     
-    if (pipboy.justPressed(DOWN_BUTTON) && USBselect < 5 && subWindowOpen ==false) USBselect += 1;
+    if (pipboy.justPressed(DOWN_BUTTON) && USBselect < 4 && subWindowOpen ==false) USBselect += 1;
     if (pipboy.justPressed(UP_BUTTON) && USBselect > 0 && subWindowOpen ==false) USBselect -= 1;
     if (pipboy.justPressed(A_BUTTON) && subWindowOpen == false ) {
       bleep();
@@ -691,7 +738,7 @@ void bigloop() {
     break;
 
     case 4:
-    //serialPlotter();
+    oscilloscope();
     break;
   }
  if (pipboy.justPressed(B_BUTTON) && gamestate != 2 && mainMenu != USB) {

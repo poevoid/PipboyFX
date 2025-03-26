@@ -70,6 +70,7 @@ image_t portland = "../assets/map_128x64.png";
 image_t losangeles = "../assets/lamap_128x64.png";
 
 image_t tinyFont = "../assets/tinyfont_5x4.png";
+image_t voidlogo = "../assets/punklogobw_128x64.png";
 
 image_t arduboyFont = "../assets/arduboyFont_6x8.png";
 
@@ -341,6 +342,9 @@ string openTerm = "Open Terminal(L)";
 string seria = "Serial"
 string sterm = "Terminal"
 string splot = "Plotter"
+string osci = "Oscilloscope/Mic"
+string mica = "Mic on A4"
+string micb = "Mic on A5"
 
 string anything = "Anything Goes";
 string johnny = "Johnny Guitar";

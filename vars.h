@@ -6,6 +6,8 @@
 #define SCALE_HIGH 100.0
 #define ADC_PIN RED_LED
 #define ADC_MAX 1023
+
+int micpin = A4;
 bool gamecontrolleropen = false;
 
 uint8_t gamestate = 0;
@@ -24,17 +26,25 @@ uint8_t debouncer =2;
 bool subWindowOpen =false;
 String inputString = "";
 bool stringComplete =false;
-int lastSample;
+bool oscilloscopeOpen = false;
+
 uint8_t windowx = 64;
 uint8_t windowy = 15;
 uint8_t windowwidth =64;
 uint8_t windowheight =46;
 uint8_t subusbselect =0;
+
+int sample;
+int lastsample; 
+int newy;
+int yoffset = -280;
+int ampVal =2;
+
 struct Wave {
-  int x;
-  int y;
+  int x, y;
 };
-Wave wave = {64,0};
+Wave waverad = {64,0};
+Wave waveosc = {0,0};
 bool toggleflashlight = false;
 
 //int pin[6] = {A0, A1, A2, A3, 7, 8};
